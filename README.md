@@ -21,6 +21,8 @@ limitations under the License.
 
 **AI Sheet** is an open-source solution to use generative AI directly from a Google Spreadsheet.
 
+![Demo](img/demo.gif)
+
 ## Getting Started
 
 To get started With AI Sheet:
