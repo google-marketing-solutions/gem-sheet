@@ -14,14 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!DOCTYPE html>
+
 <head>
-  <title>⭐ AI Sheet ⭐</title>
+  <title>💎 GemSheet 💎</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: sans-serif;
     }
+
     button {
       margin-top: 10px;
       width: 100%;
@@ -34,20 +36,24 @@ limitations under the License.
       transition: background-color 150ms linear;
       cursor: pointer;
     }
+
     button:not(.flat-button) {
       padding: 15px;
     }
+
     button:hover:not(:disabled),
     button.back {
       background-color: white;
       border: 1px solid #027ad6;
       color: #027ad6;
     }
+
     button.back:hover {
       background-color: #027ad6;
       border: 1px solid #027ad6;
       color: white;
     }
+
     button:disabled,
     button[disabled] {
       cursor: auto;
@@ -55,77 +61,96 @@ limitations under the License.
       border-color: #bbb !important;
       color: white !important;
     }
+
     .hidden {
       display: none !important;
     }
+
     .loading {
       font-weight: bold;
       text-align: center;
       color: green;
     }
+
     #header {
       position: fixed;
       padding: 8px;
       width: 100%;
       background-color: white;
     }
+
     #brand {
       text-align: center;
       color: #027ad6;
       font-size: 24px;
     }
+
     #status {
       font-weight: bold;
       text-align: center;
     }
+
     #metrics {
       text-align: center;
     }
+
     #summary {
       color: #1e8e3e;
       font-weight: bold;
       text-align: center;
     }
+
     #content {
       padding: 8px;
       padding-top: 100px;
     }
+
     #run {
       background-color: #005495;
       border: 1px solid #005495;
     }
+
     #run:hover {
       background-color: white;
       color: #005495;
     }
+
     #stop-generating {
       background-color: #ea4335;
       border-color: #ea4335;
       color: white;
     }
+
     #stop-generating:hover {
       background-color: #c5221f;
     }
+
     .selector-controls {
       justify-content: space-between;
       display: flex;
       gap: 10px;
     }
+
     #selector-form {
       margin-top: 10px;
     }
+
     .checkbox-content {
       margin-left: 10px;
     }
+
     .active {
       color: green;
     }
+
     .not-active {
       color: #777777;
     }
+
     .error {
       color: #ea4335;
     }
+
     .error-message {
       white-space: pre-wrap;
     }
@@ -157,15 +182,15 @@ limitations under the License.
 
 <script>
 
-// Helper to interact with AppScript backend without "callback-hell"
-const googleScriptRun = new Proxy({}, {
-    get: (target, prop, receiver) => (...args) => 
-      new Promise((resolve, reject) => 
+  // Helper to interact with AppScript backend without "callback-hell"
+  const googleScriptRun = new Proxy({}, {
+    get: (target, prop, receiver) => (...args) =>
+      new Promise((resolve, reject) =>
         google.script.run
           .withSuccessHandler(res => resolve(res))
           .withFailureHandler(err => { throw err })[prop](...args))
   });
-  
+
   const load = async () => {
     const config = await googleScriptRun.getConfig();
     console.log("loaded config:", config);
@@ -176,12 +201,12 @@ const googleScriptRun = new Proxy({}, {
   }
 
   const save = async () => {
-      const config = {
-        endpoint: document.getElementById("endpoint").value,
-        project: document.getElementById("project").value,
-        textModel: document.getElementById("textModel").value,
-        imageModel: document.getElementById("imageModel").value
-      }
+    const config = {
+      endpoint: document.getElementById("endpoint").value,
+      project: document.getElementById("project").value,
+      textModel: document.getElementById("textModel").value,
+      imageModel: document.getElementById("imageModel").value
+    }
     console.log('saving new config', config);
     await googleScriptRun.saveConfig(config);
   }
@@ -203,7 +228,7 @@ const googleScriptRun = new Proxy({}, {
 
 <body onload="load()">
   <div id='header'>
-    <h1 id='brand'>⭐ AI Sheet ⭐</h1>
+    <h1 id='brand'>💎 GemSheet 💎</h1>
   </div>
 
   <div id='content'>
@@ -213,41 +238,41 @@ const googleScriptRun = new Proxy({}, {
       <button onclick='generateMissing(this);'>Generate only missing</button>
     </section>
 
-    
+
     <section id='config_section'>
 
       <details>
         <summary> Show Config </summary>
         <p>
-          <div class="form-group">
-            <label for="input-text">Your Endpoint</label>
-            <input type="text" id="endpoint" placeholder="loading...">
-          </div>
+        <div class="form-group">
+          <label for="input-text">Your Endpoint</label>
+          <input type="text" id="endpoint" placeholder="loading...">
+        </div>
 
-          <div class="form-group">
-            <label for="input-text">Your Project ID</label>
-            <input type="text" id="project" placeholder="loading...">
-          </div>
+        <div class="form-group">
+          <label for="input-text">Your Project ID</label>
+          <input type="text" id="project" placeholder="loading...">
+        </div>
 
-          <div class="form-group">
-            <label for="input-text">Text Model</label>
-            <input type="text" id="textModel" placeholder="loading...">
-          </div>
+        <div class="form-group">
+          <label for="input-text">Text Model</label>
+          <input type="text" id="textModel" placeholder="loading...">
+        </div>
 
-          <div class="form-group">
-            <label for="input-text">Image Model</label>
-            <input type="text" id="imageModel" placeholder="loading...">
-          </div>
+        <div class="form-group">
+          <label for="input-text">Image Model</label>
+          <input type="text" id="imageModel" placeholder="loading...">
+        </div>
 
-          <button onclick='save()'>Save config</button>
-      </p>
+        <button onclick='save()'>Save config</button>
+        </p>
       </details>
 
 
 
     </section>
 
-  <div id='error' class='error-message'></div>
+    <div id='error' class='error-message'></div>
 </body>
 
 

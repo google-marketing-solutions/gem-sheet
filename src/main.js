@@ -19,7 +19,7 @@ const RESPONSE_COLUMN_INDEX = 2;
 const RESPONSE_RANGE_PREFIX_TEXT = 'AI_TEXT';
 const RESPONSE_RANGE_PREFIX_IMAGES = 'AI_IMAGE';
 
-const processPrompts  = (promptHandler, regenerateResult, allSheets, rangePrefix, resultTransformer = null) => {
+const processPrompts = (promptHandler, regenerateResult, allSheets, rangePrefix, resultTransformer = null) => {
   const ranges = allSheets
     ? SpreadsheetApp.getActiveSpreadsheet().getNamedRanges()
     : SpreadsheetApp.getActiveSheet().getNamedRanges();
@@ -37,7 +37,7 @@ const processPrompts  = (promptHandler, regenerateResult, allSheets, rangePrefix
           console.log("would override " + resultCell.getValue());
           resultCell.setValue(resultTransformer ? resultTransformer(result) : result);
           SpreadsheetApp.flush(); // to instantly show results
-          console.log({prompt, previousResult, result});
+          console.log({ prompt, previousResult, result });
         } else {
           console.log(`skipping existing result ${previousResult}`)
         }
@@ -53,9 +53,9 @@ const creatCellImageForBase64 = base64Data => SpreadsheetApp
 const generate = (regenerateResult, allSheets) => {
   const config = getConfig();
 
-  const textGenerator = predict(config.endpoint, config.project, config.textModel);
+  const textGenerator = gemini({ endpoint: config.endpoint, projectID: config.project, modelID: config.textModel, location: "us-central1" });
   const imageGenerator = generateImage(config.endpoint, config.project, config.imageModel);
-  
+
   processPrompts(textGenerator, regenerateResult, allSheets, RESPONSE_RANGE_PREFIX_TEXT);
   processPrompts(imageGenerator, regenerateResult, allSheets, RESPONSE_RANGE_PREFIX_IMAGES, creatCellImageForBase64);
 }
