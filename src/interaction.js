@@ -15,26 +15,26 @@ limitations under the License.
 */
 const onOpen = () => {
   SpreadsheetApp.getUi()
-    .createMenu('⭐ AI Sheet ⭐')
+    .createMenu('💎 GemSheet 💎')
     .addItem('Activate Sidebar', showConfigSidebar.name)
-    .addItem('Generate missing', generateMissingHere.name)
-    .addItem('Generate all (override exsisting)', generateAllHere.name)
+    .addItem('Generate missing', generateMissing.name)
+    .addItem('Generate all (override exsisting)', generateAll.name)
     .addToUi();
 }
 
-const generateAllHere = () => { generate(true,  false); }
-const generateMissingHere = () => { generate(false, false); }
+const generateAll = () => { generate(true, false); }
+const generateMissing = () => { generate(false, false); }
 
 const showConfigSidebar = () => {
   const html = HtmlService.createTemplateFromFile('sidebar').evaluate();
   html.setTitle(' ');
-  SpreadsheetApp.getUi().showSidebar(html);  
+  SpreadsheetApp.getUi().showSidebar(html);
 }
 
 const defaultConfig = {
-  endpoint: 'us-central1-aiplatform.googleapis.com', 
+  endpoint: 'us-central1-aiplatform.googleapis.com',
   project: '<YOUR_CLOUD_PROJECT_ID_HERE>',
-  textModel: 'text-bison',
+  textModel: 'gemini-pro',
   imageModel: 'imagegeneration'
 }
 
