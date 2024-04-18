@@ -34,7 +34,7 @@ const showConfigSidebar = () => {
 const defaultConfig = {
   endpoint: 'us-central1-aiplatform.googleapis.com',
   project: '<YOUR_CLOUD_PROJECT_ID_HERE>',
-  textModel: 'gemini-pro',
+  textModel: 'gemini-pro-vision',
   imageModel: 'imagegeneration'
 }
 

@@ -19,33 +19,29 @@ const baseParams = {
   'contentType': 'application/json',
   'muteHttpExceptions': true,
   'headers': {
-    'Authorization': `Bearer ${ScriptApp.getOAuthToken()}`,
+   'Authorization': `Bearer ${ScriptApp.getOAuthToken()}`,
   }
 };
 
-const addAuth = params => Object.assign({ payload: JSON.stringify(params) }, {
+const addAuth = params => Object.assign({payload: JSON.stringify(params)}, {
   'method': 'POST',
   'contentType': 'application/json',
-  'muteHttpExceptions': true,
+  'muteHttpExceptions': false,
   'headers': {
-    'Authorization': `Bearer ${ScriptApp.getOAuthToken()}`,
+   'Authorization': `Bearer ${ScriptApp.getOAuthToken()}`,
   }
 });
 
 const fetchJson = (url, params) => {
-  const text = UrlFetchApp.fetch(url, params).getContentText();
-  let res = undefined;
-  try {
-    res = JSON.parse(text);
-  } catch (e) {
-    alert(`Response is not valid JSON:\n${text}`);
-  }
-  if (res?.error) {
-    console.log({ url, params });
-    const prompt = res?.error.message || JSON.stringify(res?.error, null, 2);
-    alert(prompt);
-  }
-  return res;
+ let res = undefined;
+ try {
+   const text = UrlFetchApp.fetch(url, params).getContentText();
+   res = JSON.parse(text);
+ } catch (err) {
+   alert(err);
+   throw err;
+ }
+ return res;
 }
 
 /**
@@ -63,29 +59,44 @@ const fetchJson = (url, params) => {
 /**
 * @param {GeminiConfig} config
 */
-const gemini = config => prompt => {
-  const serviceUrl = `https://${config.endpoint}/v1/projects/${config.projectID}/locations/${config.location}/publishers/google/models/${config.modelID}:streamGenerateContent`
-  const res = fetchJson(serviceUrl, addAuth({
-    "contents": [{
-      "role": "user",
-      "parts": [{ "text": prompt }]
-    }],
-    "generation_config": {
-      "temperature": config.temperature || 0.4,
-      "topP": config.topP || 1.,
-      "topK": 32,
-      "maxOutputTokens": config.maxOutputTokens || 2048
-    }
-  }));
-  return res?.map(r => r.candidates?.[0].content?.parts?.[0].text).join('');
+const gemini = config => prompt =>
+ geminiRequest(config)([createATextPromptPart(prompt)]);
+
+/**
+* @param {GeminiConfig} config
+*/
+const geminiRequest = config => parts => {
+ const serviceUrl = `https://${config.endpoint}/v1/projects/${config.projectID}/locations/${config.location}/publishers/google/models/${config.modelID}:streamGenerateContent`
+ const res = fetchJson(serviceUrl, addAuth({
+   "contents": [{
+       "role": "user",
+       parts
+     }],
+   "generation_config": {
+       "temperature": config.temperature || 0.4,
+       "topP": config.topP || 1.,
+       "topK": config.topK || 32,
+       "maxOutputTokens": config.maxOutputTokens || 2048
+   }
+ }));
+ return res?.map(r => r.candidates?.[0].content?.parts?.[0].text).join('');
 }
 
-const generateImage = (endpoint, projectId, modelId) => (prompt, sampleCount = 1) => {
-  const serviceUrl = `https://${endpoint}/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${modelId}:predict`;
-  const payload = {
-    'instances': [{ prompt }],
-    'parameters': { sampleCount }
-  };
-  const res = fetchJson(serviceUrl, addAuth(payload));
-  return res.predictions?.map(e => e.bytesBase64Encoded)[0];
-}
+const createATextPromptPart = prompt => ({ "text": prompt });
+
+const createImageContentPart = base64Image => ({
+ inlineData : {
+   "mimeType": "image/png",
+   "data": base64Image
+ }
+});
+
+ const generateImage = (endpoint, projectId, modelId) => prompt => {
+   const serviceUrl = `https://${endpoint}/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${modelId}:predict`;
+   const payload = {
+     'instances': [{ prompt}],
+     'parameters': {"sampleCount": 1}
+   };
+   const res = fetchJson(serviceUrl, addAuth(payload));
+   return res.predictions?.map(e => e.bytesBase64Encoded)[0];
+ }

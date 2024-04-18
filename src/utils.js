@@ -24,7 +24,7 @@ const truncateRows = (sheet, headerRows) => {
   var lastColumn = sheet.getLastColumn();
 
   if (lastRow > headerRows) {
-    sheet.getRange(headerRows + 1, 1, lastRow - headerRows, lastColumn).clearContent();
+      sheet.getRange(headerRows + 1, 1, lastRow - headerRows, lastColumn).clearContent();
   }
 }
 
@@ -47,13 +47,29 @@ const getScriptProperties = key =>
 const setScriptProperties = (key, value) =>
   PropertiesService.getScriptProperties().setProperty(key, value);
 
-function* generateCartesianProduct(a, b) {
-  for (const rowA of a) {
-    for (const rowB of b) {
-      yield [...rowA, ...rowB];
+  function* generateCartesianProduct(a, b) {
+    for (const rowA of a) {
+        for (const rowB of b) {
+            yield [...rowA, ...rowB];
+        }
     }
-  }
 }
+
+const getRangesForPrefix = (sheet, prefix) => sheet.getNamedRanges()
+  .filter(namedRange => namedRange.getName().startsWith(prefix));
+
+const getCellsFromRange = range => {
+  const cells = [];
+  for (let i = 1; i <= range.getNumRows(); i++) {
+    const row = [];
+    for (let j = 1; j <= range.getNumColumns(); j++) {
+      row.push(range.getCell(i, j));
+    }
+    cells.push(row);
+  }
+  return cells;
+}
+
 const CARTESIAN_PRODUCT = (a, b) =>
   [...generateCartesianProduct(a.filter(isNonEmptyRow), b.filter(isNonEmptyRow))];
 
