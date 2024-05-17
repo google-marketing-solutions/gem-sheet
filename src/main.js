@@ -80,7 +80,7 @@ const cellToPart = cell => {
 }
 const nonEmptyCell = cell => {
   const value = cell.getValue();
-  return value?.length > 0;
+  return value?.length > 0 || cell.getFormula().length > 0;
 }
 
 const generate = (regenerateResult, allSheets) => {
@@ -93,7 +93,7 @@ const generate = (regenerateResult, allSheets) => {
   processPrompts(textGenerator, regenerateResult, allSheets, RESPONSE_RANGE_PREFIX_TEXT);
   processPrompts(imageGenerator, regenerateResult, allSheets, RESPONSE_RANGE_PREFIX_IMAGES, createCellImageForBase64);
   processPrompts((_, cells) => {
-    const parts = cells.filter(nonEmptyCell).map(cellToPart);
+    const parts = cells.filter(nonEmptyCell).map(cellToPart).filter(part => part !== undefined);
     return parts.length > 0 ? multiModal(parts) : null;
   }, regenerateResult, allSheets, RESPONSE_RANGE_PREFIX_MULTIMODAL);
 }
